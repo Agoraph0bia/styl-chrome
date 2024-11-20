@@ -1,34 +1,32 @@
 {
   "manifest_version": 3,
-  "name": "Chrome Extension v3 Starter",
-  "description": "A minimal example of a chrome extension using manifest v3",
+  "name": "Styl Chrome Extension",
+  "description": "Manage page styles using templates with CSS injection",
   "version": "0.0.1",
-  "icons": {
-    "16": "logo/logo-16.png",
-    "48": "logo/logo-48.png",
-    "128": "logo/logo-128.png"
-  },
-  "action": {
-    "default_title": "Chrome Addon v3 Starter",
-    "default_popup": "src/popup/index.html"
+  "icons": {},
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html",
+    "openPanelOnActionClick": true
   },
   "permissions": [
     "tabs",
     "webNavigation",
     "webRequest",
-    "webRequestBlocking",
     "contextMenus",
-    "storage"
+    "storage",
+    "sidePanel"
   ],
   "host_permissions": ["*://*/*"],
   "background": {
-    "service_worker": "src/shared/service-worker.ts"
+    "service_worker": "dist/src/shared/service_worker.js"
   },
   "content_scripts": [
     {
-      "js": ["foreground.js"],
-
-      "matches": ["https://github.com/*"]
+      "run_at": "document_start",
+      "js": ["dist/src/inject/content_script.js"],
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "persistent": true
     }
   ]
 }

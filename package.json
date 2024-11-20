@@ -2,10 +2,10 @@
   "name": "styl-chrome",
   "version": "0.0.1",
   "description": "",
-  "main": "webpack.config.js",
+  "main": "webpack.config.ts",
   "scripts": {
     "start": "webpack --mode development",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production && tsc"
   },
   "author": "",
   "license": "ISC",
@@ -14,14 +14,21 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
     "@babel/register": "^7.25.9",
+    "@types/chrome": "^0.0.283",
+    "@types/node": "^22.9.1",
+    "@types/sanitize-html": "^2.13.0",
     "@types/webpack-dev-server": "^4.7.1",
     "babel-loader": "^9.2.1",
     "chrome-types": "^0.1.321",
     "copy-webpack-plugin": "^12.0.2",
+    "sanitize-html": "^2.13.1",
     "ts-loader": "^9.5.1",
     "typescript": "^5.6.3",
     "webpack": "^5.96.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "dexie": "^4.0.10"
   }
 }

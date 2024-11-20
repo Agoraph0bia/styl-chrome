@@ -3,7 +3,17 @@ import { Configuration } from 'webpack';
 // import 'webpack-dev-server';
 
 const config: Configuration = {
-  entry: './src/index.ts',
+  entry: {
+    app: './src/index.ts',
+    'service-worker': {
+      import: './src/shared/service_worker.ts',
+      filename: './src/shared/service_worker.js',
+    },
+    content_script: {
+      import: './src/inject/content_script.ts',
+      filename: './src/inject/content_script.js',
+    },
+  },
   module: {
     rules: [
       {

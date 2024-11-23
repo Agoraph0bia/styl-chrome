@@ -1,45 +1,41 @@
+import CopyPlugin from 'copy-webpack-plugin';
 import path from 'path';
-import { Configuration } from 'webpack';
-// import 'webpack-dev-server';
+import Dotenv from 'dotenv-webpack';
 
-const config: Configuration = {
-  entry: {
-    app: './src/index.ts',
-    'service-worker': {
-      import: './src/shared/service_worker.ts',
-      filename: './src/shared/service_worker.js',
-    },
-    content_script: {
-      import: './src/inject/content_script.ts',
-      filename: './src/inject/content_script.js',
-    },
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(ts|js)?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-typescript'],
-          },
-        },
-      },
-    ],
-  },
-  resolve: {
-    extensions: ['.ts', '.js'],
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
-  },
-  // devServer: {
-  //   static: path.join(__dirname, 'dist'),
-  //   compress: true,
-  //   port: 4000,
-  // },
+const outputPath = 'dist';
+
+const entryPoints = {
+	app: [path.resolve(__dirname, 'src/shared', 'app.ts')],
+	background: path.resolve(__dirname, 'src/shared', 'background.ts'),
+	content_script: path.resolve(__dirname, 'src/inject', 'content_script.ts'),
 };
 
-export default config;
+module.exports = {
+	entry: entryPoints,
+	output: {
+		path: path.join(__dirname, outputPath),
+		filename: '[name].js',
+	},
+	resolve: {
+		extensions: ['.ts', '.js'],
+	},
+	module: {
+		rules: [
+			{
+				test: /\.tsx?$/,
+				loader: 'ts-loader',
+				exclude: /node_modules/,
+			},
+			{
+				test: /\.(jpg|jpeg|png|gif|woff|woff2|eot|ttf|svg)$/i,
+				use: 'url-loader?limit=1024',
+			},
+		],
+	},
+	plugins: [
+		new CopyPlugin({
+			patterns: [{ from: '.', to: '.', context: 'dist' }],
+		}),
+		new Dotenv(),
+	],
+};

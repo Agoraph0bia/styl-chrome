@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 async function attachDebugger(tabId: number) {
 	await chrome.debugger.attach({ tabId }, '1.2');
-	return true;
+	return false;
 }
 
 // chrome.runtime.sendMessage('requestStyls', (response: any) => {

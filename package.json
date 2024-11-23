@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "webpack.config.ts",
+  "type": "module",
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack --mode production --watch"

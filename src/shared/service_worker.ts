@@ -1,27 +1,35 @@
-chrome.runtime.onInstalled.addListener(() => {
-	chrome.action.onClicked.addListener((tab) => {
-		chrome.debugger.attach(
-			{ tabId: tab.id },
-			'1.0',
-			onAttach.bind(null, tab.id)
-		);
-	});
+const excludedUrls = ['https://google.com'];
+
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error));
+
+chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  if (!tab.url) return;
+  const url = new URL(tab.url);
+
+  // Enables the side panel on google.com
+  if (excludedUrls.includes(url.origin)) {
+    console.log('disabled');
+    await chrome.sidePanel
+      .setOptions({
+        tabId,
+        enabled: false,
+      })
+      .catch((error) => console.error(error));
+  } else {
+    // Disables the side panel on all other sites
+    console.log('enabled');
+    await chrome.sidePanel
+      .setOptions({
+        tabId,
+        path: 'src/sidepanel/sidepanel.html',
+        enabled: true,
+      })
+      .catch((error) => console.error(error));
+  }
 });
-
-function onAttach(tabId?: number) {
-	if (chrome.runtime.lastError) {
-		alert(chrome.runtime.lastError.message);
-		return;
-	}
-
-	if (tabId)
-		chrome.windows.create({
-			url: 'headers.html?' + tabId,
-			type: 'popup',
-			width: 800,
-			height: 600,
-		});
-}
+chrome.runtime.onInstalled.addListener(() => {});
 
 // //Move everything to oninstalled for prod
 // chrome.sidePanel

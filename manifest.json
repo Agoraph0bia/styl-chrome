@@ -4,10 +4,8 @@
   "description": "Manage page styles using templates with CSS injection",
   "version": "0.0.1",
   "icons": {},
-  "action": {},
-  "side_panel": {
-    "default_path": "src/sidepanel/sidepanel.html",
-    "openPanelOnActionClick": true
+  "action": {
+    "default_title": "Click to open panel"
   },
   "permissions": [
     "tabs",
@@ -17,11 +15,12 @@
     "storage",
     "sidePanel",
     "debugger",
-    "scripting"
+    "scripting",
+    "management"
   ],
   "host_permissions": ["<all_urls>"],
   "background": {
-    "service_worker": "dist/background.js"
+    "service_worker": "dist/service_worker.js"
   },
   "content_scripts": [
     {

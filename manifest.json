@@ -3,7 +3,6 @@
   "name": "Styl Extension",
   "description": "Manage page styles using templates with CSS injection",
   "version": "0.0.1",
-  "icons": {},
   "action": {
     "default_title": "Click to open panel"
   },

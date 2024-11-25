@@ -1,4 +1,6 @@
-const excludedUrls = ['https://google.com'];
+const excludedUrls = ['https://www.google.com'];
+
+// chrome.action.openPopup()
 
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
@@ -7,10 +9,8 @@ chrome.sidePanel
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (!tab.url) return;
   const url = new URL(tab.url);
-
   // Enables the side panel on google.com
   if (excludedUrls.includes(url.origin)) {
-    console.log('disabled');
     await chrome.sidePanel
       .setOptions({
         tabId,
@@ -19,7 +19,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
       .catch((error) => console.error(error));
   } else {
     // Disables the side panel on all other sites
-    console.log('enabled');
     await chrome.sidePanel
       .setOptions({
         tabId,
@@ -30,7 +29,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   }
 });
 chrome.runtime.onInstalled.addListener(() => {});
-
 // //Move everything to oninstalled for prod
 // chrome.sidePanel
 //   .setPanelBehavior({ openPanelOnActionClick: true })

@@ -8,6 +8,7 @@ const entryPoints = {
   app: [path.resolve(__dirname, 'src/shared', 'app.ts')],
   service_worker: path.resolve(__dirname, 'src/shared', 'service_worker.ts'),
   content_script: path.resolve(__dirname, 'src/inject', 'content_script.ts'),
+  sidepanel: path.resolve(__dirname, 'src/sidepanel', 'sidepanel.ts'),
 };
 
 module.exports = {

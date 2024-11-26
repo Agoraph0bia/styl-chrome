@@ -32,7 +32,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 		ext: 'Styl',
 		type: 'elementpicker',
 		action: 'urlchange',
-		url: url,
+		url: tab.url,
 		extensionid: chrome.runtime.id,
 	});
 });

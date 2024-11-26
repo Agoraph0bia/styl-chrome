@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
+	console.log(msg);
 	if (msg?.ext !== 'Styl') return;
 
 	if (msg.type === 'elementpicker') {
@@ -112,12 +113,5 @@ function updatePage(url: URL) {
 // 		islands: islands.join(''),
 // 	});
 // };
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	if (request.text == 'getStuff') {
-		console.log('test sent');
-		sendResponse({ type: 'test' });
-	}
-});
 
 // injectPickerScript(document.URL);

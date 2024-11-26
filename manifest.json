@@ -1,5 +1,6 @@
 {
   "manifest_version": 3,
+  "minimum_chrome_version": "101",
   "name": "Styl Extension",
   "description": "Manage page styles using templates with CSS injection",
   "version": "0.0.1",
@@ -15,12 +16,18 @@
     "sidePanel",
     "debugger",
     "scripting",
-    "management"
+    "management",
+    "offscreen",
+    "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": ["<all_urls>"],
   "background": {
-    "service_worker": "dist/service_worker.js"
+    "service_worker": "dist/service_worker.js",
+    "type": "module"
   },
+  "externally_connectable": {
+    "matches": ["<all_urls>"]
+},
   "content_scripts": [
     {
       "run_at": "document_start",
@@ -28,7 +35,7 @@
       "matches": ["<all_urls>"],
       "all_frames": true,
       "match_about_blank": true,
-      "persistent": true
+      "persistent": false
     }
   ]
 }

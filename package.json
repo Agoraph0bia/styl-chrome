@@ -19,6 +19,7 @@
     "@types/dotenv-webpack": "^7.0.8",
     "@types/node": "^22.9.1",
     "@types/sanitize-html": "^2.13.0",
+    "@types/uuid": "^10.0.0",
     "@types/webpack-dev-server": "^4.7.1",
     "babel-loader": "^9.2.1",
     "chrome-types": "^0.1.321",
@@ -30,6 +31,7 @@
   },
   "dependencies": {
     "dexie": "^4.0.10",
-    "dotenv-webpack": "^8.1.0"
+    "dotenv-webpack": "^8.1.0",
+    "uuid": "^8.3.2"
   }
 }

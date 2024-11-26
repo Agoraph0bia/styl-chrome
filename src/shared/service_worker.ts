@@ -1,34 +1,42 @@
 const excludedUrls = ['https://www.google.com'];
 
-// chrome.action.openPopup()
+chrome.runtime.onInstalled.addListener(() => {});
 
 chrome.sidePanel
-  .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => console.error(error));
+	.setPanelBehavior({ openPanelOnActionClick: true })
+	.catch((error) => console.error(error));
 
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
-  if (!tab.url) return;
-  const url = new URL(tab.url);
-  // Enables the side panel on google.com
-  if (excludedUrls.includes(url.origin)) {
-    await chrome.sidePanel
-      .setOptions({
-        tabId,
-        enabled: false,
-      })
-      .catch((error) => console.error(error));
-  } else {
-    // Disables the side panel on all other sites
-    await chrome.sidePanel
-      .setOptions({
-        tabId,
-        path: 'src/sidepanel/sidepanel.html',
-        enabled: true,
-      })
-      .catch((error) => console.error(error));
-  }
+	if (!tab.url) return;
+	const url = new URL(tab.url);
+	// Enables the side panel on google.com
+	if (excludedUrls.includes(url.origin)) {
+		await chrome.sidePanel
+			.setOptions({
+				tabId,
+				enabled: false,
+			})
+			.catch((error) => console.error(error));
+	} else {
+		// Disables the side panel on all other sites
+		await chrome.sidePanel
+			.setOptions({
+				tabId,
+				path: '../src/sidepanel/sidepanel.html',
+				enabled: true,
+			})
+			.catch((error) => console.error(error));
+	}
+
+	chrome.runtime.sendMessage({
+		ext: 'Styl',
+		type: 'elementpicker',
+		action: 'urlchange',
+		url: url,
+		extensionid: chrome.runtime.id,
+	});
 });
-chrome.runtime.onInstalled.addListener(() => {});
+
 // //Move everything to oninstalled for prod
 // chrome.sidePanel
 //   .setPanelBehavior({ openPanelOnActionClick: true })

@@ -27,14 +27,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 			})
 			.catch((error) => console.error(error));
 	}
-
-	chrome.runtime.sendMessage({
-		ext: 'Styl',
-		type: 'elementpicker',
-		action: 'urlchange',
-		url: tab.url,
-		extensionid: chrome.runtime.id,
-	});
 });
 
 // //Move everything to oninstalled for prod

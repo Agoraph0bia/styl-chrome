@@ -1,4 +1,5 @@
-let extensionId: string;
+let iframe: HTMLIFrameElement;
+let iframePort: MessagePort | undefined;
 
 document.addEventListener('mousemove', sendRect, { capture: true });
 
@@ -7,43 +8,77 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 	if (msg.type === 'elementpicker') {
 		switch (msg.action) {
-			case 'urlchange':
-				extensionId = msg.extensionid;
+			case 'start':
+				injectIframe(msg.uniqueid);
 		}
 	}
 
 	return true;
 });
 
-async function sendRect(e: MouseEvent) {
-	const elements = document.elementsFromPoint(e.pageX, e.pageY);
-	const rect = await getElementRect(elements);
-	await chrome.runtime.sendMessage(extensionId, {
-		ext: 'Styl',
-		type: 'elementpicker',
-		action: 'mousemove',
-		rect: rect,
-	});
-	return true;
+async function injectIframe(uniqueid: string) {
+	iframe = document.createElement('iframe');
+	document.documentElement.append(iframe);
+	iframe.addEventListener(
+		'load',
+		() => {
+			iframe.id = uniqueid;
+			const channel = new MessageChannel();
+			iframePort = channel.port1;
+			// iframePort.onmessage = (ev) => {
+			// 	onDialogMessage(ev.data || {});
+			// };
+			iframePort.onmessageerror = () => {
+				stopElementPicker();
+			};
+			// iframe.contentWindow?.postMessage(
+			// 	{ what: 'epickerStart' },
+			// 	url.href,
+			// 	[ channel.port2 ]
+			// );
+		},
+		{ once: true }
+	);
+	if (iframe.contentWindow)
+		iframe.contentWindow.location = window.location.href + '/elementpicker/';
 }
 
-function getElementRect(elements: any[]) {
+function stopElementPicker() {
+	if (iframePort) {
+		iframePort.close();
+		iframePort = undefined;
+	}
+}
+
+async function sendRect(e: MouseEvent) {
+	const elements = document.elementsFromPoint(e.pageX, e.pageY);
+	const points = await getPoints(elements);
+
+	iframePort?.postMessage({
+		points: points,
+	});
+}
+
+function getPoints(elements: any[]) {
 	for (const e of elements) {
 		let rect: DOMRect = e.getBoundingClientRect();
 
 		if (rect.width !== 0 && rect.height !== 0) {
-			return rect;
+			return {
+				x1: rect.x,
+				y1: rect.y,
+				x2: rect.x + rect.width,
+				y2: rect.y + rect.height,
+			};
 		}
 
 		if (e.shadowRoot instanceof DocumentFragment) {
-			return getElementRect(e.shadowRoot);
+			return getPoints(e.shadowRoot);
 		}
 
-		getElementRect(Array.from(e.children));
-
-		return rect; //Return empty rect to remove existing border
+		getPoints(Array.from(e.children));
 	}
-	return undefined;
+	return undefined; //Return empty rect to remove existing border
 }
 
 // import { startElementPicker } from 'dist/elementPicker.js';

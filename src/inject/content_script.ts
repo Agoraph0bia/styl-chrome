@@ -68,7 +68,7 @@ function getPoints(elements: any[]) {
 				x1: rect.x,
 				y1: rect.y,
 				x2: rect.x + rect.width,
-				y2: rect.y + rect.height,
+				y2: rect.y + rect.height + 0,
 			};
 		}
 

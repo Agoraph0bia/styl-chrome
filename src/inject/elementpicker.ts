@@ -3,17 +3,11 @@ let iframe: HTMLIFrameElement;
 document.addEventListener('DOMContentLoaded', (event) => {
 	iframe = document.createElement('iframe');
 	document.documentElement.append(iframe);
-
-	let div = document.createElement('div');
-	div.style.width = '100%';
-	div.style.height = '100%';
-	div.style.background = 'black';
-	document.documentElement.append(div);
 });
 
 chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
 	console.log(msg);
-	if (msg?.ext !== 'Styl') return;
+	if (msg?.ext + '' !== 'Styl') return;
 
 	if (msg.type === 'elementpicker') {
 		switch (msg.action) {

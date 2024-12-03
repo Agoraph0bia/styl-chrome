@@ -1,40 +1,48 @@
-let iframe: HTMLIFrameElement;
+export type Points = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
 
 document.addEventListener('DOMContentLoaded', (event) => {
-	iframe = document.createElement('iframe');
-	document.documentElement.append(iframe);
+  const { port1, port2 } = new MessageChannel();
+  port1.onmessage = (ev: MessageEvent) => drawRect(ev.data);
+  port2.postMessage({ action: 'start' });
 });
 
 chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
-	console.log(msg);
-	if (msg?.ext + '' !== 'Styl') return;
+  console.log(msg);
+  if (msg?.ext + '' !== 'Styl') return;
 
-	if (msg.type === 'elementpicker') {
-		switch (msg.action) {
-			case 'mousemove':
-				drawRect(msg.rect);
-			case 'urlchange':
-				updatePage(new URL(msg.url));
-		}
-	}
+  if (msg.type === 'elementpicker') {
+    switch (msg.action) {
+      case 'updaterect':
+        drawRect(msg.rect);
+      //   case 'urlchange':
+      //     updatePage(new URL(msg.url));
+    }
+  }
 
-	return true;
+  return true;
 });
 
-function drawRect(rect: DOMRect) {}
-
-function updatePage(url: URL) {
-	if (!iframe?.contentWindow) return;
-
-	iframe.contentWindow.location = url.href;
-	iframe.contentWindow.addEventListener(
-		'message',
-		(event) => {
-			console.log(event.data);
-		},
-		false
-	);
+async function drawRect(points: Points) {
+  console.log(points);
 }
+
+// function updatePage(url: URL) {
+//   if (!iframe?.contentWindow) return;
+
+//   iframe.contentWindow.location = url.href;
+//   iframe.contentWindow.addEventListener(
+//     'message',
+//     (event) => {
+//       console.log(event.data);
+//     },
+//     false
+//   );
+// }
 
 // export const injectPickerScript = async (urlString: string) => {
 // 	const url = new URL(urlString);

@@ -1,14 +1,8 @@
-#styl-elementpicker {
-    background: transparent !important; 
-    visibility: hidden !important;
-    cursor: not-allowed !important;
-    position: fixed !important;
-    top: 0 !important;
+html {
     height: 100% !important;
     width: 100% !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    z-index: 2147483647 !important;
-    opacity: 1 !important;
-    color-scheme: light dark !important;
+}
+body {
+    height: 100% !important;
+    width: 100% !important;
 }

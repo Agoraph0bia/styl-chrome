@@ -37,7 +37,7 @@
     {
       "run_at": "document_start",
       "js": ["dist/content_script.js"],
-      "css": ["src/inject/elementpicker.css"],
+      "css": ["src/inject/content_script.css"],
       "matches": ["<all_urls>"],
       "all_frames": true,
       "match_about_blank": true,

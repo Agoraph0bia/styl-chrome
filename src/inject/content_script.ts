@@ -1,10 +1,10 @@
 // import { v4 } from 'uuid';
 
 export type Points = {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
+	x1: number;
+	y1: number;
+	x2: number;
+	y2: number;
 };
 
 let iframe: HTMLIFrameElement;
@@ -13,55 +13,63 @@ let port1: MessagePort, port2: MessagePort;
 let lastPoints: Points | undefined;
 
 document.addEventListener('DOMContentLoaded', (event) => {
-  if (window !== top) return;
+	if (window !== top) return;
 
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    console.log('recieved');
-    if (msg.type === 'elementpicker') {
-      switch (msg.action) {
-        case 'start':
-          createIframe(msg.extId);
-      }
-    }
+	chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+		console.log('recieved');
+		if (msg.type === 'elementpicker') {
+			switch (msg.action) {
+				case 'start':
+					createIframe(msg.extId);
+			}
+		}
 
-    return true;
-  });
+		return true;
+	});
 });
 
 async function createIframe(extId: string) {
-  return new Promise((resolve) => {
-    iframe = document.createElement('iframe');
-    iframe.id = 'styl-elementpicker';
-    document.documentElement.append(iframe);
+	return new Promise((resolve) => {
+		iframe = document.createElement('iframe');
+		iframe.id = 'styl-elementpicker';
 
-    iframe.onload = () => {
-      let channel = new MessageChannel();
-      port1 = channel.port1;
-      port2 = channel.port2;
+		document.documentElement.append(iframe);
 
-      port2.onmessage((ev: MessageEvent) => {
-        switch (ev.data.action) {
-          case 'start':
-            addListener;
-        }
-      });
+		iframe.addEventListener(
+			'load',
+			() => {
+				let channel = new MessageChannel();
+				port1 = channel.port1;
+				port2 = channel.port2;
 
-      port1.onmessageerror = () => {
-        stopElementPicker();
-      };
-      port2.onmessageerror = () => {
-        stopElementPicker();
-      };
-      // iframe.contentWindow?.postMessage(
-      // 	{ type: 'elementpicker', action: 'start', secret: 'sdf' },
-      // 	`chrome-extension://${extId}/src/inject/elementpicker.html`,
-      // 	[iframePort]
-      // );
+				port1.onmessage = (ev: MessageEvent) => {
+					switch (ev.data.type) {
+						case 'mousemove':
+							sendPoints(ev.data);
+						case 'stop':
+							stopElementPicker;
+					}
+				};
 
-      resolve(iframe);
-    };
-    iframe.src = `chrome-extension://${extId}/src/inject/elementpicker.html`;
-  });
+				port1.onmessageerror = () => {
+					stopElementPicker();
+				};
+				iframe.contentWindow?.postMessage(
+					{ type: 'start' },
+					`chrome-extension://${extId}/src/inject/elementpicker.html`,
+					[port1, port2]
+				);
+
+				iframe.focus();
+
+				resolve(iframe);
+			},
+			{ once: true }
+		);
+
+		if (iframe.contentWindow)
+			iframe.contentWindow.location = `chrome-extension://${extId}/src/inject/elementpicker.html`;
+	});
 }
 
 // async function addIframeCSS() {
@@ -99,58 +107,60 @@ async function createIframe(extId: string) {
 // }
 
 function stopElementPicker() {
-  if (port1) {
-    port1.onmessage = null;
-    port1.onmessageerror = null;
-    port1.close();
-  }
-  if (port2) {
-    port2.onmessage = null;
-    port2.onmessageerror = null;
-    port2.close();
-  }
-  if (iframe) {
-    iframe.onload = null;
-    iframe.remove();
-  }
+	if (port1) {
+		port1.onmessage = null;
+		port1.onmessageerror = null;
+		port1.close();
+	}
+	if (port2) {
+		port2.onmessage = null;
+		port2.onmessageerror = null;
+		port2.close();
+	}
+	if (iframe) {
+		iframe.onload = null;
+		iframe.remove();
+	}
 }
 
-async function sendPoints(e: MouseEvent) {
-  const elements = document.elementsFromPoint(e.pageX, e.pageY);
-  const points = await getPoints(elements);
-  if (
-    points?.x1 === lastPoints?.x1 &&
-    points?.x2 === lastPoints?.x2 &&
-    points?.y1 === lastPoints?.y1 &&
-    points?.y2 === lastPoints?.y2
-  )
-    return;
-  lastPoints = points;
-  port2.postMessage({
-    points: points,
-  });
+async function sendPoints(mousePos: { x: number; y: number }) {
+	const elements = document.elementsFromPoint(mousePos.x, mousePos.y);
+	const points = await getPoints(elements);
+	if (
+		points?.x1 === lastPoints?.x1 &&
+		points?.x2 === lastPoints?.x2 &&
+		points?.y1 === lastPoints?.y1 &&
+		points?.y2 === lastPoints?.y2
+	)
+		return;
+	lastPoints = points;
+	console.log('1', points);
+	port2.postMessage({
+		type: 'drawrect',
+		points: points,
+	});
 }
 
 function getPoints(elements: any[]) {
-  for (const e of elements) {
-    let rect: DOMRect = e.getBoundingClientRect();
+	for (const e of elements) {
+		let rect: DOMRect = e.getBoundingClientRect();
 
-    if (rect.width > 0 && rect.height > 0) {
-      return {
-        x1: rect.x,
-        y1: rect.y,
-        x2: rect.x + rect.width,
-        y2: rect.y + rect.height,
-      };
-    }
+		if (rect.width > 0 && rect.height > 0) {
+			return {
+				x1: rect.x,
+				y1: rect.y,
+				x2: rect.x + rect.width,
+				y2: rect.y + rect.height,
+			};
+		}
 
-    if (e.shadowRoot instanceof DocumentFragment) {
-      return getPoints(e.shadowRoot);
-    }
+		if (e.shadowRoot instanceof DocumentFragment) {
+			return getPoints(e.shadowRoot);
+		}
 
-    getPoints(Array.from(e.children));
-  }
-  return undefined; //Return empty rect to remove existing border
+		getPoints(Array.from(e.children));
+	}
+	return undefined; //Return empty rect to remove existing border
 }
 
 // import { startElementPicker } from 'dist/elementPicker.js';

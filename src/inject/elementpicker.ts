@@ -7,43 +7,50 @@ export type Points = {
 	y2: number;
 };
 
-document.addEventListener('DOMContentLoaded', (event) => {
-	let channel = new MessageChannel();
-	port1 = channel.port1;
-	port2 = channel.port2;
+window.addEventListener('message', (e) => {
+	if (e.ports?.length !== 2) return;
 
-	addListeners().then(sendStart);
-});
+	port1 = e.ports[0];
+	port2 = e.ports[1];
 
-async function addListeners() {
-	port2.onmessage = (ev: MessageEvent) => drawRect(ev.data);
+	port2.onmessage = (ev: MessageEvent) =>
+		ev.data.type === 'drawrect' ? drawRect(ev.data) : null;
+
 	window.addEventListener('mousemove', sendMousePos, {
 		capture: true,
 	});
 	window.addEventListener('keyup', (key) =>
 		key.key == 'Escape' ? sendStop() : null
 	);
-}
+});
 
 async function sendMousePos(e: MouseEvent) {
-	if (lastPos.x !== e.pageX || lastPos.y !== e.pageY)
+	console.log('Test');
+	if (lastPos?.x !== e.pageX && lastPos?.y !== e.pageY) {
+		lastPos = { x: e.pageX, y: e.pageY };
 		port1.postMessage({
-			type: 'mouseMove',
+			type: 'mousemove',
 			x: e.pageX,
 			y: e.pageY,
 		});
+	}
 }
 
-async function sendStart() {
+// async function sendStart() {
+// 	port1.postMessage({
+// 		type: 'start',
+// 	});
+// }
+
+async function sendStop() {
 	port1.postMessage({
-		type: 'start',
+		type: 'stop',
 	});
 }
 
-async function sendStop() {}
-
-async function drawRect(points: Points) {
-	console.log(points);
+async function drawRect(points: any) {
+	console.log('test2');
+	top?.window.console.log('2', points);
 }
 
 // function updatePage(url: URL) {

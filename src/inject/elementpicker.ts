@@ -1,34 +1,49 @@
+let port1: MessagePort, port2: MessagePort, lastPos: { x: number; y: number };
+
 export type Points = {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
+	x1: number;
+	y1: number;
+	x2: number;
+	y2: number;
 };
 
 document.addEventListener('DOMContentLoaded', (event) => {
-  const { port1, port2 } = new MessageChannel();
-  port1.onmessage = (ev: MessageEvent) => drawRect(ev.data);
-  port2.postMessage({ action: 'start' });
+	let channel = new MessageChannel();
+	port1 = channel.port1;
+	port2 = channel.port2;
+
+	addListeners().then(sendStart);
 });
 
-chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
-  console.log(msg);
-  if (msg?.ext + '' !== 'Styl') return;
+async function addListeners() {
+	port2.onmessage = (ev: MessageEvent) => drawRect(ev.data);
+	window.addEventListener('mousemove', sendMousePos, {
+		capture: true,
+	});
+	window.addEventListener('keyup', (key) =>
+		key.key == 'Escape' ? sendStop() : null
+	);
+}
 
-  if (msg.type === 'elementpicker') {
-    switch (msg.action) {
-      case 'updaterect':
-        drawRect(msg.rect);
-      //   case 'urlchange':
-      //     updatePage(new URL(msg.url));
-    }
-  }
+async function sendMousePos(e: MouseEvent) {
+	if (lastPos.x !== e.pageX || lastPos.y !== e.pageY)
+		port1.postMessage({
+			type: 'mouseMove',
+			x: e.pageX,
+			y: e.pageY,
+		});
+}
 
-  return true;
-});
+async function sendStart() {
+	port1.postMessage({
+		type: 'start',
+	});
+}
+
+async function sendStop() {}
 
 async function drawRect(points: Points) {
-  console.log(points);
+	console.log(points);
 }
 
 // function updatePage(url: URL) {
@@ -43,37 +58,6 @@ async function drawRect(points: Points) {
 //     false
 //   );
 // }
-
-// export const injectPickerScript = async (urlString: string) => {
-// 	const url = new URL(urlString);
-
-// 	return new Promise((resolve) => {
-// 		iframe = document.createElement('iframe');
-// 		const uuid = v4();
-
-// 		iframe.addEventListener(
-// 			'load',
-// 			() => {
-// 				iframe.id = uuid;
-// 				// const channel = new MessageChannel();
-// 				// pickerFramePort = channel.port1;
-// 				// pickerFramePort.onmessage = (ev) => {
-// 				// 	onDialogMessage(ev.data || {});
-// 				// };
-// 				// pickerFramePort.onmessageerror = () => {
-// 				// 	quitPicker();
-// 				// };
-// 				// iframe.contentWindow.postMessage({ what: 'epickerStart' }, url.href, [
-// 				// 	channel.port2,
-// 				// ]);
-// 				resolve(iframe);
-// 			},
-// 			{ once: true }
-// 		);
-// 		document.documentElement.append(iframe);
-// 		if (iframe.contentWindow) iframe.contentWindow.location = url.href;
-// 	});
-// };
 
 // const highlightElements = function (elems, force) {
 // 	// To make mouse move handler more efficient

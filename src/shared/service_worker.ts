@@ -29,6 +29,28 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 	}
 });
 
+// chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+// 	console.log('test');
+// 	if (msg.type === 'elementpicker') {
+// 		switch (msg.action) {
+// 			case 'start':
+// 				injectContentScript();
+// 		}
+// 	}
+// });
+
+// async function injectContentScript() {
+// 	let tabs = await chrome.tabs.query({ currentWindow: true, active: true });
+// 	let tabId = tabs[0]?.id;
+// 	console.log(tabId);
+// 	if (!tabId) return;
+
+// 	chrome.scripting.executeScript({
+// 		target: { tabId: tabId, allFrames: true },
+// 		files: ['dist/content_script.js'],
+// 	});
+// }
+
 // //Move everything to oninstalled for prod
 // chrome.sidePanel
 //   .setPanelBehavior({ openPanelOnActionClick: true })

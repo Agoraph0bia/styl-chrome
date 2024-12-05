@@ -16,9 +16,7 @@
     "sidePanel",
     "debugger",
     "scripting",
-    "management",
-    "offscreen",
-    "declarativeNetRequestWithHostAccess"
+    "management"
   ],
   "host_permissions": ["<all_urls>"],
   "background": {
@@ -28,14 +26,22 @@
   "externally_connectable": {
     "matches": ["<all_urls>"]
 },
+"web_accessible_resources": [
+    {
+      "resources": [ "src/inject/*" ],
+      "matches": [ "<all_urls>" ]
+    }
+    
+],
   "content_scripts": [
     {
       "run_at": "document_start",
       "js": ["dist/content_script.js"],
+      "css": ["src/inject/elementpicker.css"],
       "matches": ["<all_urls>"],
       "all_frames": true,
       "match_about_blank": true,
-      "persistent": false
+      "persistent": true
     }
   ]
 }

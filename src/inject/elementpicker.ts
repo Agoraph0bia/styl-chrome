@@ -1,21 +1,31 @@
-let port1: MessagePort;
+let port1: MessagePort, svg: SVGRectElement;
 // , port2: MessagePort, lastPos: { x: number; y: number };
 
 export type Points = {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
+	x1: number;
+	y1: number;
+	x2: number;
+	y2: number;
 };
 
-window.addEventListener('message', (e) => {
-  if (e.ports?.length !== 1) return;
+window.addEventListener(
+	'message',
+	(e) => {
+		if (e.ports?.length !== 1 || e.data?.type !== 'start') return;
 
-  port1 = e.ports[0];
+		port1 = e.ports[0];
 
-  port1.onmessage = (ev: MessageEvent) =>
-    ev.data.type === 'drawrect' ? drawRect(ev.data) : null;
-});
+		port1.onmessage = (ev: any) => {
+			switch (ev.data.type) {
+				case 'drawrect':
+					drawRect(ev.data.points);
+			}
+		};
+
+		port1.postMessage({ type: 'created' });
+	},
+	{ once: true }
+);
 
 // async function sendMousePos(e: MouseEvent) {
 //   console.log('Test');
@@ -49,22 +59,7 @@ window.addEventListener('message', (e) => {
 //   }
 // }
 
-async function drawRect(points: any) {
-  console.log('2', points);
-}
-
-// function updatePage(url: URL) {
-//   if (!iframe?.contentWindow) return;
-
-//   iframe.contentWindow.location = url.href;
-//   iframe.contentWindow.addEventListenesr(
-//     'message',
-//     (event) => {
-//       console.log(event.data);
-//     },
-//     false
-//   );
-// }
+function drawRect(points: any) {}
 
 // const highlightElements = function (elems, force) {
 // 	// To make mouse move handler more efficient

@@ -1,40 +1,33 @@
-let port1: MessagePort, port2: MessagePort, lastPos: { x: number; y: number };
+let port1: MessagePort;
+// , port2: MessagePort, lastPos: { x: number; y: number };
 
 export type Points = {
-	x1: number;
-	y1: number;
-	x2: number;
-	y2: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
 };
 
 window.addEventListener('message', (e) => {
-	if (e.ports?.length !== 2) return;
+  if (e.ports?.length !== 1) return;
 
-	port1 = e.ports[0];
-	port2 = e.ports[1];
+  port1 = e.ports[0];
 
-	port2.onmessage = (ev: MessageEvent) =>
-		ev.data.type === 'drawrect' ? drawRect(ev.data) : null;
-
-	window.addEventListener('mousemove', sendMousePos, {
-		capture: true,
-	});
-	window.addEventListener('keyup', (key) =>
-		key.key == 'Escape' ? sendStop() : null
-	);
+  port1.onmessage = (ev: MessageEvent) =>
+    ev.data.type === 'drawrect' ? drawRect(ev.data) : null;
 });
 
-async function sendMousePos(e: MouseEvent) {
-	console.log('Test');
-	if (lastPos?.x !== e.pageX && lastPos?.y !== e.pageY) {
-		lastPos = { x: e.pageX, y: e.pageY };
-		port1.postMessage({
-			type: 'mousemove',
-			x: e.pageX,
-			y: e.pageY,
-		});
-	}
-}
+// async function sendMousePos(e: MouseEvent) {
+//   console.log('Test');
+//   if (lastPos?.x !== e.pageX && lastPos?.y !== e.pageY) {
+//     lastPos = { x: e.pageX, y: e.pageY };
+//     port1.postMessage({
+//       type: 'mousemove',
+//       x: e.pageX,
+//       y: e.pageY,
+//     });
+//   }
+// }
 
 // async function sendStart() {
 // 	port1.postMessage({
@@ -42,22 +35,29 @@ async function sendMousePos(e: MouseEvent) {
 // 	});
 // }
 
-async function sendStop() {
-	port1.postMessage({
-		type: 'stop',
-	});
-}
+// async function sendStop() {
+//   if (port1) {
+//     port1.postMessage({
+//       type: 'stop',
+//     });
+//     port1.onmessage = null;
+//     port1.onmessageerror = null;
+//   }
+//   if (port2) {
+//     port2.onmessage = null;
+//     port2.onmessageerror = null;
+//   }
+// }
 
 async function drawRect(points: any) {
-	console.log('test2');
-	top?.window.console.log('2', points);
+  console.log('2', points);
 }
 
 // function updatePage(url: URL) {
 //   if (!iframe?.contentWindow) return;
 
 //   iframe.contentWindow.location = url.href;
-//   iframe.contentWindow.addEventListener(
+//   iframe.contentWindow.addEventListenesr(
 //     'message',
 //     (event) => {
 //       console.log(event.data);

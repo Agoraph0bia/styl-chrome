@@ -1,4 +1,4 @@
-let port1: MessagePort, svg: SVGRectElement;
+let port1: MessagePort, svg: HTMLElement | null, lastPoints: Points | undefined;
 // , port2: MessagePort, lastPos: { x: number; y: number };
 
 export type Points = {
@@ -7,6 +7,13 @@ export type Points = {
 	x2: number;
 	y2: number;
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+	svg = document.getElementById('rect');
+	document.addEventListener('mousemove', (e) => {
+		console.log(e.clientX, lastPoints?.x1, e.clientY, lastPoints?.y1);
+	});
+});
 
 window.addEventListener(
 	'message',
@@ -18,7 +25,7 @@ window.addEventListener(
 		port1.onmessage = (ev: any) => {
 			switch (ev.data.type) {
 				case 'drawrect':
-					drawRect(ev.data.points);
+					drawRect(ev.data.points, ev.data.element);
 			}
 		};
 
@@ -26,6 +33,27 @@ window.addEventListener(
 	},
 	{ once: true }
 );
+
+function drawRect(points: Points, element: string) {
+	if (!svg) return;
+	if (!points) {
+		svg.setAttribute('viewBox', '0');
+		svg.setAttribute('d', '');
+	} else {
+		let width = points.x2 - points.x1;
+		let height = points.y2 - points.y1;
+
+		// svg.setAttribute('viewBox', `${points.x1} ${points.y1} ${width} ${height}`);
+
+		let d = `M ${points.x1},${points.y1} h ${width} v ${height} h ${-width} Z`;
+
+		svg.setAttribute('d', d);
+		var test = document.getElementById('test');
+		if (test?.textContent) test.textContent = element;
+	}
+
+	lastPoints = points;
+}
 
 // async function sendMousePos(e: MouseEvent) {
 //   console.log('Test');
@@ -58,8 +86,6 @@ window.addEventListener(
 //     port2.onmessageerror = null;
 //   }
 // }
-
-function drawRect(points: any) {}
 
 // const highlightElements = function (elems, force) {
 // 	// To make mouse move handler more efficient

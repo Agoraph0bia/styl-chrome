@@ -70,9 +70,10 @@ function addListeners() {
 	document.addEventListener('mousemove', sendPoints, {
 		capture: true,
 	});
-	window.addEventListener('keyup', (key) =>
-		key.key == 'Escape' ? stopElementPicker : null
+	document.addEventListener('keyup', (key) =>
+		key.key === 'Escape' ? stopElementPicker : null
 	);
+	document.addEventListener('mouseup', (key) => stopElementPicker());
 }
 
 // async function addIframeCSS() {
@@ -126,9 +127,9 @@ function stopElementPicker() {
 	}
 }
 
-function sendPoints(mousePos: { x: number; y: number }) {
-	const elements = document.elementsFromPoint(mousePos.x, mousePos.y);
-	const points = getPoints(elements);
+function sendPoints(ev: MouseEvent) {
+	const elements = document.elementsFromPoint(ev.pageX, ev.pageY);
+	const points = getElement(elements);
 	if (
 		points?.x1 === lastPoints?.x1 &&
 		points?.x2 === lastPoints?.x2 &&
@@ -140,10 +141,11 @@ function sendPoints(mousePos: { x: number; y: number }) {
 	port1.postMessage({
 		type: 'drawrect',
 		points: points,
+		element: elements[0]?.tagName.toLowerCase,
 	});
 }
 
-function getPoints(elements: any[]) {
+function getElement(elements: any[]) {
 	for (const e of elements) {
 		let rect: DOMRect = e.getBoundingClientRect();
 
@@ -157,10 +159,10 @@ function getPoints(elements: any[]) {
 		}
 
 		if (e.shadowRoot instanceof DocumentFragment) {
-			return getPoints(e.shadowRoot);
+			return getElement(e.shadowRoot);
 		}
 
-		getPoints(Array.from(e.children));
+		getElement(Array.from(e.children));
 	}
 	return undefined; //Return empty rect to remove existing border
 }
